@@ -51,14 +51,6 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         elif type(y) != np.ndarray:
             raise Exception ('class label y must be a numpy array')
 
-        #To encode the label, to ensure that the class lebel starts with 0, which is important for np.argmax
-        self.class_lablenc_ = LabelEncoder()
-        self.class_lablenc_.fit(y)
-        self.classes = self.class_lablenc_.classes_
-
-        #to store unique classes you do
-        self.classes_ = unique_labels(y)
-        #print self.classes_
 
         #To find the number of columns in the self_set matrix whic will help use generate same dimension of random detectors
         #X = np.array(X)
@@ -79,13 +71,14 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
             #print 'first x distance: ', dist
 
             if dist > self.self_radius_size:
-                # print 'second d distance: ',dist
+                #print 'second d distance: ',dist
                 if len(self.detector_list_) == 0:
                     self.detector_list_.append(new_random_detector)
                 else:
                     kdt = KDTree(self.detector_list_, leaf_size=30, metric='euclidean')
                     dist2, ind = kdt.query([new_random_detector], k=1)
                     if dist2 > self.self_radius_size:
+                        #print  dist2
                         self.detector_list_.append(new_random_detector)
         self.detector_list_ = np.array(self.detector_list_)
         return self
@@ -122,7 +115,10 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         return predicted_class
 
     def score(self, X, y, sample_weight=None):
+        #print X
         pred_score_ = self.predict(X)
+        #print pred_score_
+        #print accuracy_score(y_true=y,y_pred=pred_score_)
         return  accuracy_score(y_true=y,y_pred=pred_score_)
 
 
