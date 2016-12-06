@@ -3,7 +3,8 @@ from sklearn.base import ClassifierMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils.validation import check_X_y,check_array,check_is_fitted
 from sklearn.utils.multiclass import unique_labels
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score,roc_curve, auc
+from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KDTree
 import random
 import numpy as np
@@ -102,15 +103,17 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         predicted_class=[]
 
         kdt = KDTree(self.detector_list_, leaf_size=30, metric='euclidean')
-
+        self.distanceValues_ = []
         for i in range(len(X)):
             dist, ind = kdt.query([X[i]], k=1)
 #            print 'dist =', dist
+            self.distanceValues_.append(dist[0])
 
             if dist >= self.self_radius_size:
                 predicted_class.append(self.class_label[0])
             else:
                 predicted_class.append(self.class_label[1])
+        self.distanceValues_ = np.array(self.distanceValues_)
 
         return predicted_class
 
@@ -120,6 +123,91 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         #print pred_score_
         #print accuracy_score(y_true=y,y_pred=pred_score_)
         return  accuracy_score(y_true=y,y_pred=pred_score_)
+
+    def roc_curve_main(self, y,pos_label=2):
+        """
+
+        :param y: this is the class of the test data to be used in getting the ROC curve
+        :param pos_label: this is the class which will be your positive i.e abnormal
+        :return:  it return fpr, tpr, threshold and a graph in this order
+        """
+        print "self.distanceValues_", self.distanceValues_, type(self.distanceValues_)#,self.distanceValues_.shape()
+        fpr, tpr, threshold = roc_curve(y, self.distanceValues_, pos_label=2)
+        roc_auc = auc(fpr, tpr)
+
+        return fpr, tpr, threshold, roc_auc
+
+    def roc(self,test_data,ground_truth):
+        print "groud truth", ground_truth
+
+
+        #[TN,FP],[FN,TP] = confusion_matrix(ground_truth, predictions)
+        #print "TN,FP,FN,TP", TN,FP,FN,TP
+
+
+        #print max(self.distanceValues_)
+        #t = self.distanceValues_
+        option = self.distanceValues_
+        print self. distanceValues_
+        print option
+        #selected = random.choice(option)
+        #print selected
+        np.sort(option)
+        copy_radius_ =self.self_radius_size
+        fpr1=[]
+        tpr1=[]
+        for i in range(len(option)+1):
+            if i >len(option)-1:
+                self.self_radius_size = (max(self.distanceValues_) +1)[0]
+                predicted_class_ = self.predict(test_data)
+                [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
+                print "TN,FP,FN,TP", TN, FP, FN, TP
+                fpr = float(FP) / (FP + TN)
+                tpr = float(TP) / (TP + FN)
+                print "fpr, tpr", fpr, tpr
+                fpr1.append(fpr)
+                tpr1.append(tpr)
+
+            else:
+                self.self_radius_size = option[i][0]
+                predicted_class_ = self.predict(test_data)
+                [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
+                fpr = float(FP) / (FP + TN)
+                tpr = float(TP) / (TP + FN)
+                print "fpr, tpr", fpr, tpr
+                fpr1.append(fpr)
+                tpr1.append(tpr)
+
+        self.self_radius_size = copy_radius_
+
+        return fpr1, tpr1
+
+
+
+
+
+
+
+
+
+
+
+        # print predictions
+        # tp, tn, fn, fp = 0.0, 0.0, 0.0, 0.0
+        # for l, m in enumerate(ground_truth):
+        #     if m == predictions[l] and m == 1:
+        #         tp += 1
+        #     if m == predictions[l] and m == 0:
+        #         tn += 1
+        #     if m != predictions[l] and m == 1:
+        #         fn += 1
+        #     if m != predictions[l] and m == 0:
+        #         fp += 1
+        # `
+        # return tn / (tn + fp)
+
+
+
 
 
 
