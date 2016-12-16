@@ -17,7 +17,7 @@ test_data=my_data[1:400,1:6]#my_data[241:,1:6] or 201 #201:,1:6
 
 fig = plt.figure(figsize=(7,5))
 
-mc=myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=2000, self_radius_size = 0.0,
+mc=myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=2000, self_radius_size = 0.1,
                                                    random_gen_param = (0.001,1.0),class_label = (1.0,2.0))
 #print mc
 mean_tpr1 = 0.0
@@ -90,8 +90,8 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
 
 if __name__ == '__main__':
 
-    n = 1   #number of times to repeat k fold. If set to one, it becomes normal k-fold
-    k = 2   #number of folds
+    n = 5   #number of times to repeat k fold. If set to one, it becomes normal k-fold
+    k = 5   #number of folds
 
     TP, TN, FP, FN =[],[],[],[]
     ACC_out1, FPR_out1, TPR_out1, PRE_out1, F1_out1 = [],[],[],[],[]
@@ -119,6 +119,8 @@ if __name__ == '__main__':
     print "mean ACC",np.mean(ACC_out1)
     print "mean FPR",np.mean(FPR_out1)
     print "mean TPR",np.mean(TPR_out1)
+    print "mean FNR",1 - np.mean(TPR_out1)
+    print "mean TNR",(np.mean(TN))/(np.mean(FP) + np.mean(TN))
     print "mean PRE",np.mean(PRE_out1)
     print "mean F1",np.mean(F1_out1)
 
