@@ -23,6 +23,7 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
              can cause the random points to be more distributed towards more small values. The final value 1 means that
              the maximum value of the search space is 1 and 0.0001 means that the minimum value is 0.0001.
         :param class_label:this is a tuple containing the two possible labels found in the dataset. To be supplied.
+            the first index in class_label is that of the normal and the second is for the abnormal
         :param otherParam: not used for now
         """
 
@@ -38,7 +39,7 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         :param y: array-like, shape= [n_samples]. this is the vector of target class labels
         :return: it returns a self object
         """
-
+        #print "self.number_of_detectors ", self.number_of_detectors
         #To check and ensure that the parameter types correspond to what is needed or expected, we run a type check
 
         if type(self.number_of_detectors) != int:
@@ -51,6 +52,23 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
             raise Exception ('self list X must be a numpy array')
         elif type(y) != np.ndarray:
             raise Exception ('class label y must be a numpy array')
+
+        normal = []
+        #attack = []
+        j = 0
+        for i in X:
+            #print "X = ", i, y[j], self.class_label[0]
+            if y[j] == self.class_label[0]:
+                normal.append(i)
+            #else:
+            #    attack.append(i)
+            j+=1
+
+        len_normal_ = len(normal)
+        #len_attack_ = len(attack)
+        X = np.array(normal)
+        #attack = np.array(attack)
+
 
 
         #To find the number of columns in the self_set matrix whic will help use generate same dimension of random detectors
@@ -124,61 +142,77 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         #print accuracy_score(y_true=y,y_pred=pred_score_)
         return  accuracy_score(y_true=y,y_pred=pred_score_)
 
-    def roc_curve_main(self, y,pos_label=2):
-        """
-
-        :param y: this is the class of the test data to be used in getting the ROC curve
-        :param pos_label: this is the class which will be your positive i.e abnormal
-        :return:  it return fpr, tpr, threshold and a graph in this order
-        """
-        print "self.distanceValues_", self.distanceValues_, type(self.distanceValues_)#,self.distanceValues_.shape()
-        fpr, tpr, threshold = roc_curve(y, self.distanceValues_, pos_label=2)
-        roc_auc = auc(fpr, tpr)
-
-        return fpr, tpr, threshold, roc_auc
 
     def roc(self,test_data,ground_truth):
-        print "groud truth", ground_truth
+        """
 
+        :param test_data: we need this again even though it has been predicted before because we will have to iterate
+            over it for new values of self_radius
+        :param ground_truth: the real truth
+        :return: fpr1, tpr1 both are numpy arrays
+        """
 
-        #[TN,FP],[FN,TP] = confusion_matrix(ground_truth, predictions)
-        #print "TN,FP,FN,TP", TN,FP,FN,TP
-
-
-        #print max(self.distanceValues_)
-        #t = self.distanceValues_
         option = self.distanceValues_
-        print self. distanceValues_
-        print option
-        #selected = random.choice(option)
-        #print selected
+        #print self. distanceValues_
+        #print option
         np.sort(option)
         copy_radius_ =self.self_radius_size
         fpr1=[]
         tpr1=[]
         for i in range(len(option)+1):
+            #print self.self_radius_size
             if i >len(option)-1:
                 self.self_radius_size = (max(self.distanceValues_) +1)[0]
+
+                #self_radius change requires another prediction. Not the stackexchange question
                 predicted_class_ = self.predict(test_data)
-                [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
-                print "TN,FP,FN,TP", TN, FP, FN, TP
-                fpr = float(FP) / (FP + TN)
-                tpr = float(TP) / (TP + FN)
-                print "fpr, tpr", fpr, tpr
+                #print confusion_matrix(ground_truth, predicted_class_)
+                try:
+                    [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
+                except:
+                    TN = confusion_matrix(ground_truth, predicted_class_)[0][0]
+                    FP, FN, TP = 0,0,0
+
+                #print "TN,FP,FN,TP", TN, FP, FN, TP
+                try:
+                    fpr = float(FP) / (FP + TN)
+                except:
+                    fpr = 0.0
+                try:
+                    tpr = float(TP) / (TP + FN)
+                except:
+                    tpr = 0.0
+                #print "fpr, tpr", fpr, tpr
                 fpr1.append(fpr)
                 tpr1.append(tpr)
 
             else:
                 self.self_radius_size = option[i][0]
                 predicted_class_ = self.predict(test_data)
-                [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
-                fpr = float(FP) / (FP + TN)
-                tpr = float(TP) / (TP + FN)
-                print "fpr, tpr", fpr, tpr
+                #print confusion_matrix(ground_truth, predicted_class_)
+
+                #if below is run with only normal, it will create issues at one point to solve this, use try and except
+                try:
+                    [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
+                except:
+                    TN = confusion_matrix(ground_truth, predicted_class_)[0][0]
+                    FP, FN, TP = 0,0,0
+                #print "TN,FP,FN,TP", TN, FP, FN, TP
+                #print [TN, FP], [FN, TP]
+                try:
+                    fpr = float(FP) / (FP + TN)
+                except:
+                    fpr = 0.0
+                try:
+                    tpr = float(TP) / (TP + FN)
+                except:
+                    tpr = 0.0
+                #print "fpr, tpr", fpr, tpr
                 fpr1.append(fpr)
                 tpr1.append(tpr)
 
         self.self_radius_size = copy_radius_
+        #print self.self_radius_size
 
         return fpr1, tpr1
 
