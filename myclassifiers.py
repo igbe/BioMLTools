@@ -13,7 +13,7 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
 
 
     def __init__(self,number_of_detectors = 1000, self_radius_size = 0.16, random_gen_param = (0.0001,1.0),
-                 class_label = (1.0,2.0),otherParam=None):
+                 class_label = (0,1),otherParam=None):
         """
 
         :param number_of_detectors: int value of the number of detector you will like to generate
@@ -74,6 +74,7 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         #To find the number of columns in the self_set matrix whic will help use generate same dimension of random detectors
         #X = np.array(X)
         dimension = np.shape(X)[1]
+        #print "dimension", dimension
         min = self.random_gen_param[0]
         max = self.random_gen_param[1]
 
@@ -113,6 +114,8 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
 
         #check is fit had been called
         check_is_fitted(self,'detector_list_')
+
+        print "self.self_radius_size", self.self_radius_size
 
         #input validation. This will display error message if there is no input
         #X = check_array(X)

@@ -7,21 +7,8 @@ from scipy import interp
 from sklearn.cross_validation import StratifiedKFold
 from sklearn import preprocessing
 from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import LabelEncoder
 
-my_data = np.genfromtxt('breast_cancer_test_norm.csv', delimiter=',')
-normal = my_data[1:201,1:6]#my_data[1:201,1:6]
-classs_normal=my_data[1:201,6]
-classs_test=my_data[1:400,6]#my_data[241:,6]#201:,6
-test_data=my_data[1:400,1:6]#my_data[241:,1:6] or 201 #201:,1:6
-
-
-fig = plt.figure(figsize=(7,5))
-
-mc=myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=2000, self_radius_size = 0.1,
-                                                   random_gen_param = (0.001,1.0),class_label = (1.0,2.0))
-#print mc
-mean_tpr1 = 0.0
-mean_fpr1 = np.linspace(0, 1, 100)
 
 def stratifiedKFold(test_data, test_class, no_folds=2):
     mean_tpr = 0.0
@@ -35,6 +22,9 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
         k = mc.fit(test_data[train], classs_test[train]).predict(test_data[test])
         print "getting fpr and tpr for fold {}".format(i)
         fpr, tpr = mc.roc(test_data[test], classs_test[test])
+        #print mc.predict(test_data[test])
+        #print classs_test[test]
+        #print mc.score(test_data[test],classs_test[test])
         #print  fpr
         #print tpr
 
@@ -89,6 +79,28 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
 
 
 if __name__ == '__main__':
+
+    my_data = np.genfromtxt('breast_cancer_test_norm.csv', delimiter=',')
+    normal = my_data[1:201, 1:6]  # my_data[1:201,1:6]
+    classs_normal = my_data[1:201, 6]
+    classs_test = my_data[1:400, 6]  # my_data[241:,6]#201:,6
+    test_data = my_data[1:400, 1:6]  # my_data[241:,1:6] or 201 #201:,1:6
+
+    fig = plt.figure(figsize=(7, 5))
+
+    le = LabelEncoder()
+
+    y = le.fit_transform(classs_test)
+    #print y
+    classs_test = y
+    unique = np.unique(y)
+
+    mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=2000, self_radius_size=0.1,
+                                                     random_gen_param=(0.001, 1.0), class_label=(unique[0], unique[1]))
+    # print mc
+    mean_tpr1 = 0.0
+    mean_fpr1 = np.linspace(0, 1, 100)
+
 
     n = 5   #number of times to repeat k fold. If set to one, it becomes normal k-fold
     k = 5   #number of folds
