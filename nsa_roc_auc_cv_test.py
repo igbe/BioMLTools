@@ -102,7 +102,7 @@ if __name__ == '__main__':
     mean_fpr1 = np.linspace(0, 1, 100)
 
 
-    n = 5   #number of times to repeat k fold. If set to one, it becomes normal k-fold
+    n = 2   #number of times to repeat k fold. If set to one, it becomes normal k-fold
     k = 5   #number of folds
 
     TP, TN, FP, FN =[],[],[],[]
@@ -129,6 +129,7 @@ if __name__ == '__main__':
     #print "ACC_out, FPR_out, TPR_out, PRE_out,F1_out",TP, TN, FP, FN,ACC_out1, FPR_out1, TPR_out1, PRE_out1, F1_out1
 
     print "mean ACC",np.mean(ACC_out1)
+    print "mean ERR", 1 - (np.mean(ACC_out1))
     print "mean FPR",np.mean(FPR_out1)
     print "mean TPR",np.mean(TPR_out1)
     print "mean FNR",1 - np.mean(TPR_out1)

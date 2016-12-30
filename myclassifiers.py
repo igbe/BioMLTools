@@ -115,7 +115,7 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         #check is fit had been called
         check_is_fitted(self,'detector_list_')
 
-        print "self.self_radius_size", self.self_radius_size
+        #print "self.self_radius_size", self.self_radius_size
 
         #input validation. This will display error message if there is no input
         #X = check_array(X)
