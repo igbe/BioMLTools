@@ -12,18 +12,18 @@ def testClassifier(X,threshold=3):
         instead of just passing element.
     :return: a list containing the predicted class labels for the provided data.
     """
-    print X, type(X)
+    #print X, type(X)
     #array to hold the predicted label
     predicted_class=[]
-    for i in range(len(X)):
-        if i + 1 <=threshold:
+    for i in X:
+        if i <=threshold:
             predicted_class.append(1)
         else:
             predicted_class.append(-1)
 
     return predicted_class
 
-def score(X, y, sample_weight=None):
+def score(X, y,threshold, sample_weight=None):
     #print X
     pred_score_ = testClassifier(X,threshold)
     #print pred_score_
