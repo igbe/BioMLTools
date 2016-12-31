@@ -22,17 +22,22 @@ def sign(x):
 
 
 def weighted_sample(X,initial_weights):
-    my_draw = choice(X, len(X), p=initial_weights)
-    return my_draw
+    indices = range(len(X))
+    #print indices
+    my_draw = choice(indices, len(X), p=initial_weights)
+    #print my_draw
 
-def boost(X,y,weakLearner, rounds):
+    return X[my_draw]
+
+def boost(X,y,weakLearners, rounds):
    distr = normalize([1.] * len(X))     #the probability distribution or the weights assigned to each training set
    #print "weights",distr
+   print "len of weakLearner", len(weakLearners)
    tru_y = y
    hypotheses = [None] * rounds
    alpha = [0] * rounds
    error1 = []
-   tresh = [i for i in range(len(y))]
+   #tresh = [i for i in range(len(y))]
    for t in range(rounds):
        #print "weight", distr
        if t == 0:
@@ -40,8 +45,13 @@ def boost(X,y,weakLearner, rounds):
        else:
            sample = weighted_sample(X,distr)
        #print "sample", sample
-       hypotheses[t] = weakLearner(sample,threshold=random.choice(tresh))  #weakLearner(drawExample)
-       #print "hypotheses[t]", hypotheses[t]
+       try:
+           weakLearner, tresh = weakLearners[t]
+       except:
+           weakLearner = weakLearners[t]
+
+       hypotheses[t] = weakLearner.fit(sample, y).predict(X)
+       print "hypotheses[t]", hypotheses[t]
        hypothesisResults, error = computeError(hypotheses[t], y, distr)
        #print "hypothesisResults, error", hypothesisResults, error
        #print "Error", error

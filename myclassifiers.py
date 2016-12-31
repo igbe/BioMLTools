@@ -73,7 +73,12 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
 
         #To find the number of columns in the self_set matrix whic will help use generate same dimension of random detectors
         #X = np.array(X)
-        dimension = np.shape(X)[1]
+        #print np.shape(X)
+        try:
+            dimension = np.shape(X)[1]
+        except:
+            dimension = 1
+
         #print "dimension", dimension
         min = self.random_gen_param[0]
         max = self.random_gen_param[1]
