@@ -2,7 +2,7 @@ from myclassifiers_test import testClassifier
 import myclassifiers
 import numpy as np
 import matplotlib.pyplot as plt
-from myAdaboost import boost
+import myAdaboost
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import roc_curve, auc
 from scipy import interp
@@ -30,6 +30,8 @@ def convert_class(y):
             cl.append(-1)
     return cl
 
+def error(y, pred):
+    return sum(1 for i in range(len(y)) if y[i] !=pred[i])/float(len(y))
 
 ytrain =  np.array(convert_class(classs_test))
 
@@ -37,27 +39,51 @@ train = test_data
 
 
 no_of_weakLearners = 2
+rounds = no_of_weakLearners
 weakLearner = []
 for i in range(no_of_weakLearners):
     #weakLearner.append((testClassifier,tresh[i]))
     weakLearner.append(myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=500, self_radius_size=0.1,
                                                 random_gen_param=(0.001, 1.0), class_label=(1, -1)))
 
+
 #mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=500, self_radius_size=0.1,
 #                                                     random_gen_param=(0.001, 1.0), class_label=(1, -1))
 #weakLearner = testClassifier
 #print testClassifier(train)
-rounds = 2
-hypothesis,error = boost(train,ytrain,weakLearner,rounds)
 
-[TN, FP], [FN, TP] = confusion_matrix(ytrain, hypothesis)
 
-print accuracy_score(y_true=ytrain,y_pred=hypothesis)
+Ada = myAdaboost.AdaBoost(weakLearner,rounds,weightUpdate=True)
+train1 = np.concatenate((train[0:120],train[250:300]),axis=0)
+ytrain1 = np.concatenate((ytrain[0:120],ytrain[250:300]),axis=0)
 
-print TN, FP, FN, TP
+test1 = np.concatenate((train[121:240],train[300:400]),axis=0)
+ytest1 = np.concatenate((ytrain[121:240],ytrain[300:400]),axis=0)
 
-print hypothesis
-print error
+Ada.fit(train1,ytrain1)
+#print ytrain
+pred = Ada.predict(train1)
+pred1 = Ada.predict(test1)
+#print pred
+
+print "Final Train Accuracy %0.3f"%(accuracy_score(y_true=ytrain1, y_pred=pred))
+print "Final Test Accuracy %0.3f"%(accuracy_score(y_true=ytest1, y_pred=pred1))
+
+
+print error(ytrain1,pred)
+print error(ytest1,pred1)
+
+
+#hypothesis,error = (train,ytrain,weakLearner,rounds)
+
+#[TN, FP], [FN, TP] = confusion_matrix(ytrain, hypothesis)
+
+#print accuracy_score(y_true=ytrain,y_pred=hypothesis)
+
+#print TN, FP, FN, TP
+
+#print hypothesis
+#print error
 
 
 

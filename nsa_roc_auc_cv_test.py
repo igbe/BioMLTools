@@ -147,6 +147,11 @@ if __name__ == '__main__':
     #to plot the ROC curve, unomment the line below
     plt.plot([0, 1], [0, 1], linestyle='--', color='green', label='random guessing')
 
+    #plot the error
+    #print [1-i for i in ACC_out1]
+    #plt.plot([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0],[1-i for i in ACC_out1])
+
+
 
 
 

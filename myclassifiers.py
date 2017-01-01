@@ -105,8 +105,10 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
                     if dist2 > self.self_radius_size:
                         #print  dist2
                         self.detector_list_.append(new_random_detector)
+        #print self.detector_list_
         self.detector_list_ = np.array(self.detector_list_)
         return self
+
 
     def predict(self,X):
 
