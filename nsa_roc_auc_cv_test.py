@@ -29,7 +29,7 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
         #print tpr
 
         #Uncomment the line below to plot the ROC curve whose mean is use to plot the mean ROC
-        #plt.plot(fpr, tpr, 'o', lw=1, label="ROC{}".format(i))
+        #plt.plot(fpr, tpr, '--', lw=1, label="ROC{}".format(i))
 
 
         #print classs_test[test], "size" , np.shape(classs_test[test])
@@ -61,13 +61,6 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
         else:
             F1_out.append( 2 * ((PRE * TPR)/float(PRE + TPR)))
 
-        #Sort the data else, mean interpolation wont work. Note at the time of writing this,
-        #ploting fpr and tpr of pre-sort and post-sort gave same curve
-        fpr.sort()
-        tpr.sort()
-        #print  fpr
-        #print tpr
-
         #Uncomment to prove that before and after sorting plotis the same
         #plt.plot(fpr, tpr, 'ro', lw=1, label="ROC{}".format(i))
         mean_tpr +=interp(mean_fpr,fpr,tpr)
@@ -98,7 +91,7 @@ if __name__ == '__main__':
     classs_test = y
     unique = np.unique(y)
 
-    mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=500, self_radius_size=0.1,
+    mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=2000, self_radius_size=0.1,
                                                      random_gen_param=(0.001, 1.0), class_label=(unique[0], unique[1]))
     # print mc
     mean_tpr1 = 0.0
@@ -168,7 +161,7 @@ if __name__ == '__main__':
     mean_auc = auc(mean_fpr1, mean_tpr1)
 
     #plt.plot(mean_fpr,mean_tpr,'k--',lw = 3,label= "mean ROC")
-    plt.plot(mean_fpr1,mean_tpr1,'k--',lw = 3,label= "mean ROC (area = {})".format(mean_auc))
+    plt.plot(mean_fpr1,mean_tpr1,'b-',lw = 1,label= "mean ROC (area = {})".format(mean_auc))
 
 
     plt.xlabel('false positives')

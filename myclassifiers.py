@@ -152,79 +152,25 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         #print accuracy_score(y_true=y,y_pred=pred_score_)
         return  accuracy_score(y_true=y,y_pred=pred_score_)
 
-
-    def roc(self,test_data,ground_truth):
+    def roc(self, test_data, ground_truth):
         """
 
         :param test_data: we need this again even though it has been predicted before because we will have to iterate
             over it for new values of self_radius
         :param ground_truth: the real truth
-        :return: fpr1, tpr1 both are numpy arrays
+        :return: fpr, tpr both are numpy arrays
         """
 
         option = self.distanceValues_
-        #print self. distanceValues_
-        #print option
-        np.sort(option)
-        copy_radius_ =self.self_radius_size
-        fpr1=[]
-        tpr1=[]
-        for i in range(len(option)+1):
-            #print self.self_radius_size
-            if i >len(option)-1:
-                self.self_radius_size = (max(self.distanceValues_) +1)[0]
-
-                #self_radius change requires another prediction. Not the stackexchange question
-                predicted_class_ = self.predict(test_data)
-                #print confusion_matrix(ground_truth, predicted_class_)
-                try:
-                    [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
-                except:
-                    TN = confusion_matrix(ground_truth, predicted_class_)[0][0]
-                    FP, FN, TP = 0,0,0
-
-                #print "TN,FP,FN,TP", TN, FP, FN, TP
-                try:
-                    fpr = float(FP) / (FP + TN)
-                except:
-                    fpr = 0.0
-                try:
-                    tpr = float(TP) / (TP + FN)
-                except:
-                    tpr = 0.0
-                #print "fpr, tpr", fpr, tpr
-                fpr1.append(fpr)
-                tpr1.append(tpr)
-
-            else:
-                self.self_radius_size = option[i][0]
-                predicted_class_ = self.predict(test_data)
-                #print confusion_matrix(ground_truth, predicted_class_)
-
-                #if below is run with only normal, it will create issues at one point to solve this, use try and except
-                try:
-                    [TN, FP], [FN, TP] = confusion_matrix(ground_truth, predicted_class_)
-                except:
-                    TN = confusion_matrix(ground_truth, predicted_class_)[0][0]
-                    FP, FN, TP = 0,0,0
-                #print "TN,FP,FN,TP", TN, FP, FN, TP
-                #print [TN, FP], [FN, TP]
-                try:
-                    fpr = float(FP) / (FP + TN)
-                except:
-                    fpr = 0.0
-                try:
-                    tpr = float(TP) / (TP + FN)
-                except:
-                    tpr = 0.0
-                #print "fpr, tpr", fpr, tpr
-                fpr1.append(fpr)
-                tpr1.append(tpr)
-
-        self.self_radius_size = copy_radius_
-        #print self.self_radius_size
-
-        return fpr1, tpr1
+        scores = [option[i][0] for i in range(len(option))]
+        # used self.class_label[0] which should be the normal class instead of the abnormal class of self.class_label[1]
+        # because the sckitlearn roc curve being used inverts the graph if correct self.class_label[1] is used.
+        fpr, tpr, thresholds = roc_curve(ground_truth, scores, pos_label=self.class_label[0])
+        # print "fprt, tprt", fpr, tpr
+        # print thresholds
+        # print auc(fpr,tpr)
+        # plt.show()
+        return fpr, tpr
 
 
 

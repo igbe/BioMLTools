@@ -1,8 +1,6 @@
-from myclassifiers_test import testClassifier
+import myclassifiers
 import numpy as np
 import matplotlib.pyplot as plt
-from myAdaboost import boost
-import myclassifiers
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import roc_curve, auc
 from scipy import interp
@@ -12,10 +10,12 @@ from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 
 
-
 def stratifiedKFold(test_data, test_class, no_folds=2):
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
+
+    fpr1 = []
+    tpr1 = []
     cv = StratifiedKFold(test_class, n_folds=no_folds,random_state=1)
     classs_test = test_class
     TP_out, TN_out, FP_out, FN_out, ACC_out, FPR_out, TPR_out, PRE_out,F1_out = [],[],[],[],[],[],[],[],[]
@@ -25,18 +25,7 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
         k = mc.fit(test_data[train], classs_test[train]).predict(test_data[test])
         print "getting fpr and tpr for fold {}".format(i)
         fpr, tpr = mc.roc(test_data[test], classs_test[test])
-        #print mc.predict(test_data[test])
-        #print classs_test[test]
-        #print mc.score(test_data[test],classs_test[test])
-        #print  fpr
-        #print tpr
 
-        #Uncomment the line below to plot the ROC curve whose mean is use to plot the mean ROC
-        #plt.plot(fpr, tpr, 'o', lw=1, label="ROC{}".format(i))
-
-
-        #print classs_test[test], "size" , np.shape(classs_test[test])
-        #print k, "size", np.shape(k)
 
         # To find mmetrics
         [TN, FP], [FN, TP] = confusion_matrix(classs_test[test], k)
@@ -68,8 +57,12 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
         #ploting fpr and tpr of pre-sort and post-sort gave same curve
         fpr.sort()
         tpr.sort()
-        #print  fpr
-        #print tpr
+
+        fpr1.append(sum(fpr) / len(fpr))
+        tpr1.append(sum(tpr) / len(tpr))
+
+        print  "fpr",fpr
+        print "tpr",tpr
 
         #Uncomment to prove that before and after sorting plotis the same
         #plt.plot(fpr, tpr, 'ro', lw=1, label="ROC{}".format(i))
@@ -77,6 +70,8 @@ def stratifiedKFold(test_data, test_class, no_folds=2):
         mean_tpr[0] = 0.0
     #print "TP_out, TN_out, FP_out, FN_out, ACC_out, FPR_out, TPR_out, PRE_out,F1_out", \
    #     TP_out, TN_out, FP_out, FN_out, ACC_out, FPR_out, TPR_out, PRE_out, F1_out
+    print  "fpr1",fpr1
+    print "tpr1",tpr1
     return mean_fpr,mean_tpr,cv,TP_out, TN_out, FP_out, FN_out, ACC_out, FPR_out, TPR_out, PRE_out, F1_out
 
 
@@ -89,6 +84,9 @@ if __name__ == '__main__':
     classs_test = my_data[1:400, 6]  # my_data[241:,6]#201:,6
     test_data = my_data[1:400, 1:6]  # my_data[241:,1:6] or 201 #201:,1:6
 
+#    test_data = np.concatenate((test_data[0:120], test_data[250:300]), axis=0)
+#    classs_test = np.concatenate((classs_test[0:120], classs_test[250:300]), axis=0)
+
     fig = plt.figure(figsize=(7, 5))
 
     le = LabelEncoder()
@@ -98,15 +96,15 @@ if __name__ == '__main__':
     classs_test = y
     unique = np.unique(y)
 
-    mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=2000, self_radius_size=0.1,
+    mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=1000, self_radius_size=0.1,
                                                      random_gen_param=(0.001, 1.0), class_label=(unique[0], unique[1]))
     # print mc
     mean_tpr1 = 0.0
     mean_fpr1 = np.linspace(0, 1, 100)
 
 
-    n = 2   #number of times to repeat k fold. If set to one, it becomes normal k-fold
-    k = 5   #number of folds
+    n = 1   #number of times to repeat k fold. If set to one, it becomes normal k-fold
+    k = 2   #number of folds
 
     TP, TN, FP, FN =[],[],[],[]
     ACC_out1, FPR_out1, TPR_out1, PRE_out1, F1_out1 = [],[],[],[],[]
@@ -129,7 +127,17 @@ if __name__ == '__main__':
         mean_tpr1 += interp(mean_fpr1, mean_fpr, mean_tpr)
         mean_tpr1[0] = 0.0
 
+        print FPR_out1
+        #print mean_fpr1
+        print TPR_out1
+        #print mean_tpr1
+
     #print "ACC_out, FPR_out, TPR_out, PRE_out,F1_out",TP, TN, FP, FN,ACC_out1, FPR_out1, TPR_out1, PRE_out1, F1_out1
+
+    # print FPR_out1
+    # print mean_fpr1
+    # print TPR_out1
+    # print mean_tpr1
 
     print "mean ACC",np.mean(ACC_out1)
     print "mean ERR", 1 - (np.mean(ACC_out1))
@@ -150,11 +158,16 @@ if __name__ == '__main__':
     #to plot the ROC curve, unomment the line below
     plt.plot([0, 1], [0, 1], linestyle='--', color='green', label='random guessing')
 
+    #plot the error
+    #print [1-i for i in ACC_out1]
+    #plt.plot([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0],[1-i for i in ACC_out1])
+
+
 
 
 
     mean_tpr1 /=k * n
-    mean_tpr1[1] = 1.0
+    mean_tpr1[-1] = 1.0
     #mean_tpr[-1] = 1.0
     mean_fpr1.sort()
     mean_tpr1.sort()
@@ -178,51 +191,6 @@ if __name__ == '__main__':
     plt.grid()
     plt.show()
 
-pool = Pool()
-pool.map(create_thumbnail, images)
-pool.close()
-pool.join()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# train = [1,2,3,4,5,6,7,8,9,10]
-# ytrain = [ 1 , 1 , 1 ,-1 ,-1, -1,  1,  1,  1, -1]
-#
-#
-# weakLearner = testClassifier
-# print testClassifier(train)
-# rounds = 100
-# hypothesis,error = boost(train,ytrain,weakLearner,rounds)
-# print hypothesis
-# print error
-#error_range = np.arange(0,1,0.1)
-#plt.plot(error_range,[0.5,0.4,0.583,0.371,0.222,0.395,0.908,0.692,0.299,0.500])
-#
