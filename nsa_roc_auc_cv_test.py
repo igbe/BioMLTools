@@ -86,6 +86,9 @@ if __name__ == '__main__':
     classs_test = my_data[1:400, 6]  # my_data[241:,6]#201:,6
     test_data = my_data[1:400, 1:6]  # my_data[241:,1:6] or 201 #201:,1:6
 
+#    test_data = np.concatenate((test_data[0:120], test_data[250:300]), axis=0)
+#    classs_test = np.concatenate((classs_test[0:120], classs_test[250:300]), axis=0)
+
     fig = plt.figure(figsize=(7, 5))
 
     le = LabelEncoder()
@@ -95,15 +98,15 @@ if __name__ == '__main__':
     classs_test = y
     unique = np.unique(y)
 
-    mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=2000, self_radius_size=0.1,
+    mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=500, self_radius_size=0.1,
                                                      random_gen_param=(0.001, 1.0), class_label=(unique[0], unique[1]))
     # print mc
     mean_tpr1 = 0.0
     mean_fpr1 = np.linspace(0, 1, 100)
 
 
-    n = 2   #number of times to repeat k fold. If set to one, it becomes normal k-fold
-    k = 5   #number of folds
+    n = 1   #number of times to repeat k fold. If set to one, it becomes normal k-fold
+    k = 2   #number of folds
 
     TP, TN, FP, FN =[],[],[],[]
     ACC_out1, FPR_out1, TPR_out1, PRE_out1, F1_out1 = [],[],[],[],[]

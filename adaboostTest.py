@@ -38,13 +38,15 @@ ytrain =  np.array(convert_class(classs_test))
 train = test_data
 
 
-no_of_weakLearners = 2
-rounds = no_of_weakLearners
+no_of_weakLearners = 10
+rounds = 2 #no_of_weakLearners
 weakLearner = []
+v=1
 for i in range(no_of_weakLearners):
     #weakLearner.append((testClassifier,tresh[i]))
-    weakLearner.append(myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=500, self_radius_size=0.1,
+    weakLearner.append(myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=1200, self_radius_size=0.1,
                                                 random_gen_param=(0.001, 1.0), class_label=(1, -1)))
+    v+=1
 
 
 #mc = myclassifiers.NsaConstantDetectorClassifier(number_of_detectors=500, self_radius_size=0.1,
@@ -53,7 +55,7 @@ for i in range(no_of_weakLearners):
 #print testClassifier(train)
 
 
-Ada = myAdaboost.AdaBoost(weakLearner,rounds,weightUpdate=True)
+Ada = myAdaboost.AdaBoost(weakLearner,rounds,adatype=2,weightedSampling=True)
 train1 = np.concatenate((train[0:120],train[250:300]),axis=0)
 ytrain1 = np.concatenate((ytrain[0:120],ytrain[250:300]),axis=0)
 
