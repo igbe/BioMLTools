@@ -147,6 +147,7 @@ class deterministicDCA(BaseEstimator,ClassifierMixin):
                 k = ((signal_weights[1][1] * antigen_plus_siganls[i, 1]) + (signal_weights[1][2] * antigen_plus_siganls[i, 2]))
 
             elif col_dimension == 4:
+                #print "in column four"
                 signal_weights = self.signal_weights
                 csm = (signal_weights[0][0] * antigen_plus_siganls[i,1]) + (signal_weights[0][1] * antigen_plus_siganls[i,2])+ (signal_weights[0][2] * antigen_plus_siganls[i,3])
                 k = (signal_weights[1][0] * antigen_plus_siganls[i,1]) + (signal_weights[1][1] * antigen_plus_siganls[i,2])+ (signal_weights[1][2] * antigen_plus_siganls[i,3])
@@ -297,7 +298,7 @@ class deterministicDCA(BaseEstimator,ClassifierMixin):
 # TEST
 #########################################################
 if __name__ == '__main__':
-    multiplier = 30
+    multiplier = 10
     #dca1 = dca.DCA(dca_pop_size=0,is_it_static=True)
     data = get_data('breast_cancer_test.csv', datatype=np.float64, delimiter=',', skiprows=1, ndmin=2)
     #print 'data length, ',len(data)
@@ -319,12 +320,13 @@ if __name__ == '__main__':
     #print cells
 
     #To concatenate the antigen, dnager and safe signals
+    pamp1 = pamp[np.newaxis]
     danger1 = danger[np.newaxis]
     safe1 = safe[np.newaxis]
     antigen1 = antigen[np.newaxis]      #I called it antigen1 which will stop the original antigen array shape from being
                                         #  altered cause predict(antigen) needs it)
 
-    tot_signal = np.concatenate((antigen1.T,danger1.T,safe1.T),axis=1)
+    tot_signal = np.concatenate((antigen1.T,pamp1.T,danger1.T,safe1.T),axis=1)
     #print tot_signal
     #tuned_params = [{'signal_weights': [([0, 1, 2], [0, 2, -2]), ([0, 1, 2], [0, 1, -5]), ([0, 1, 2], [0, 1, -2])]}]
     #
