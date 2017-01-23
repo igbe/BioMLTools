@@ -86,7 +86,7 @@ def search_grid(zip_grid,anomaly_threshold,num_of_dc_selected,lifespan):
     #     # Make the Pool of workers
     #print jobs
     max_number_of_cpu = mp.cpu_count()
-    pool = ThreadPool(max_number_of_cpu)
+    pool = ThreadPool(max_number_of_cpu -2)
     #     # Open the urls in their own threads
     #     # and return the results
     results = pool.map(get_fpr_tpr, jobs)
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     # print pred
     # print "fpr,tpr",dc.roc(label)
     #fpr, tpr = dc.roc(label)
-    a, b ,c ,d ,e ,f= range(-15,15,1), range(-15,15,1),range(-15,15,1),range(-15,15,1), range(-15,15,1),range(-15,15,1)
+    a, b ,c ,d ,e ,f= range(-3,3,1), range(-3,3,1),range(-3,3,1),range(-3,3,1), range(-3,3,1),range(-3,3,1)
     #print "a,b,c", a,b,c,d,e,f
     np.vectorize(tester)(*np.ix_(a, b,c,d,e,f))
 
