@@ -314,8 +314,9 @@ if __name__ == '__main__':
     danger = new_data[:, 8]
 
     label = convert_class(data_class)
-    dc = deterministicDCA(anomaly_threshold,num_of_dc_selected = num_of_dc_selected,lifespan = 10,threshold =(5, 15),signal_weights = ([0,1,2],[0,1,-2]))
-
+    dc = deterministicDCA(anomaly_threshold,num_of_dc_selected = num_of_dc_selected,lifespan = 10,threshold =(5, 15),signal_weights = ([-2, 1, 1], [-1, 2, -3]))
+    #([-2, 1, 1], [0, 2, -3])
+    #([0,1,2],[0,1,-2])
     #cells = dc.initialize_dDCA(num_of_dc_selected)
     #print cells
 
