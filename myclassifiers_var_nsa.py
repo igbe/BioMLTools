@@ -205,7 +205,7 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
         scores = [option[i][0] for i in range(len(option))]
         # used self.class_label[0] which should be the normal class instead of the abnormal class of self.class_label[1]
         # because the sckitlearn roc curve being used inverts the graph if correct self.class_label[1] is used.
-        fpr, tpr, thresholds = roc_curve(ground_truth, scores, pos_label=self.class_label[0])
+        fpr, tpr, thresholds = roc_curve(ground_truth, scores, pos_label=self.class_label[1])
         # print "fprt, tprt", fpr, tpr
         # print thresholds
         # print auc(fpr,tpr)
