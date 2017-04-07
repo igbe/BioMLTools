@@ -2,7 +2,6 @@ import numpy as np
 import random
 #import DCA as dca
 from scipy import interp
-from sklearn.grid_search import GridSearchCV
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.base import BaseEstimator
@@ -14,7 +13,7 @@ from sklearn.neighbors import KDTree
 import pandas as pd
 import myclassifiers_var_nsa
 from util import confusion_matrix1
-import myAdaboost
+
 
 
 
