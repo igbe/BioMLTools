@@ -9,6 +9,7 @@ from sklearn.neighbors import KDTree
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 
 class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
 
@@ -105,7 +106,8 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
             if len(self.detector_list_) != 0:
                 kdt_detector = KDTree(self.detector_list_, leaf_size=30, metric='euclidean')
                 dist_d, ind_d = kdt_detector.query([new_random_detector], k=1)
-                if dist_d < self.detector_radius_list_[ind_d]:
+                #print "index is ", ind_d
+                if dist_d < self.detector_radius_list_[ind_d[0][0]]:
                     t = t + 1
                     if t >= 1/(1 - max_self_coverage):
                         break
@@ -125,14 +127,11 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
                 if T > 1/(1 - max_self_coverage):
                     break
         self.detector_list_ = np.array(self.detector_list_)
-        #self.detector_radius_list_ = np.array(self.detector_radius_list_)
 
-        #print "self.detector_radius_list_",self.detector_radius_list_
+        #print "for Circle represenating the detectors, remove the comment line for circle plotting in the fit function"
+        #"""
 
-        print "for Circle represenating the detectors, remove the comment line for circle plotting in the fit function"
-        """
-        #plt.scatter(X[:,0],X[:,1],color='yellow')
-        plt.scatter(X_[51:,0],X_[51:,1],color='red')
+#        plt.scatter(X_[51:,0],X_[51:,1],color='red')
         #plt.scatter(self.detector_list_[:,0],self.detector_list_[:,1],color='green')
 
         #fig, ax = plt.subplots()
@@ -143,10 +142,10 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
             #print "r",r
 
         for x1,y1 in zip(X[:,0],X[:,1]):
-            plt.gcf().gca().add_artist(plt.Circle((x1, y1), self.self_radius_size, color='green'))
+            plt.gcf().gca().add_artist(plt.Circle((x1, y1), self.self_radius_size, color='green',alpha=0.2))
 
         plt.show()
-        """
+        #"""
         return self
 
 
@@ -172,18 +171,28 @@ class NsaConstantDetectorClassifier (BaseEstimator,ClassifierMixin):
 
         kdt = KDTree(self.detector_list_, leaf_size=30, metric='euclidean')
         self.distanceValues_ = []
+
+        #for finding out what to send to DCA
+        #file1 = open("distance_class.csv","a")
+        #wtr1 = csv.writer(file1, delimiter=',')
+
         for i in range(len(X)):
             dist, ind = kdt.query([X[i]], k=1)
 #            print 'dist =', dist
             self.distanceValues_.append(dist[0])
 
-            if dist > self.detector_radius_list_[ind]:
+            if dist[0][0] > self.detector_radius_list_[ind[0][0]]:
+                #print dist[0][0],-1
+                #wtr1.writerows([[dist[0][0], -1]])
                 predicted_class.append(self.class_label[0])
             else:
                 predicted_class.append(self.class_label[1])
+                #print dist[0][0], 1
+                #wtr1.writerows([[dist[0][0], 1]])
+        #file1.close()
         self.distanceValues_ = np.array(self.distanceValues_)
 
-        return predicted_class
+        return np.array(predicted_class)
 
     def score(self, X, y, sample_weight=None):
         #print X
