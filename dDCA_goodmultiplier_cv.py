@@ -395,7 +395,7 @@ if __name__ == '__main__':
 
         mean_inst_fpr.append(inst_fpr)
         mean_inst_tpr.append(inst_tpr)
-        print "tpr =",inst_tpr,"fpr =",inst_fpr
+        print "inst_tpr =",inst_tpr,"inst_fpr =",inst_fpr
 
         time_end = time.time()
         print "time taken = ", time_end - time_start
