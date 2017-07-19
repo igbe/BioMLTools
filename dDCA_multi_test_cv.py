@@ -620,7 +620,7 @@ class Boost():
         # fpr, tpr, thresholds = roc_curve(y_truth, self.current_sum, pos_label=-1)
         # plt.plot(tpr,fpr)
         # plt.show()
-        file5 = open("weights_NSA_DCA_{0}_{1}.csv".format(multiplier,self.dd), "a")
+        file5 = open("weights_NSA_DCA_{0}.csv".format(multiplier), "a")
         wtr5 = csv.writer(file5, delimiter=',')
         wtr5.writerows([self.current_weight])
         file5.close()
